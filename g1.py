@@ -321,47 +321,34 @@ def get_year_from_id(user_id):
         return "غير معروف"
 
 def elia88(username):
-    user_id = get_id(username)    
-    if not user_id:
-        print("❌ لم يتم العثور على الايدي الخاص بالمستخدم")
-        return None
-    user_info = get_user_info(user_id)    
-    if not user_info:
-        print("❌ فشل في جلب المعلومات")
-        return None
-    rest_info = get_rest(username)
-    year_info = get_year_from_id(user_id)
+    # إرسال البيانات الأساسية فوراً لتليجرام لتجنب توقف السكربت
     tlg = f'''
 𝐈𝐍𝐒𝐓𝐀𝐆𝐑𝐀𝐌 
 ━─────━[ 𝑬𝑳𝑰𝑨 ]━─────━
--𝗡𝗮𝗺𝗲 : {user_info['full_name']}
--𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲 : {user_info['username']}
--𝗙𝗼𝗹𝗹𝗼𝘄𝗲𝗿𝘀 : {user_info['followers']}
--𝗙𝗼𝗹𝗹𝗼𝘄𝗶𝗻𝗴 : {user_info['following']}
--𝗘𝗺𝗮𝗶𝗹 : {user_info['username']}@gmail.com
--𝗿𝗲𝘀𝘁 : {rest_info}
--𝘆𝗲𝗮𝗿 : {year_info}
--𝗶𝗱 : {user_info['Id']}
--𝗣𝗼𝘀𝘁𝘀 : {user_info['posts']}
--𝗕𝗜𝗢 : {user_info['bio']}
--𝗣𝗿𝗶𝘃𝗮𝘁𝗲 : {'نعم' if user_info['is_private'] else 'لا'}
--𝗩𝗲𝗿𝗶𝗳𝗶𝗲𝗱 : {'نعم' if user_info['is_verified'] else 'لا'}
--𝗶𝗻𝗙𝗼 : https://www.instagram.com/{user_info['username']}
+-𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲 : {username}
+-𝗘𝗺𝗮𝗶𝗹 : {username}@gmail.com
+-𝗦𝘁𝗮𝘁𝘂𝘀 : 𝗛𝗶𝘁 ✅
 ━─────━[ 𝑬𝑳𝑰𝑨 ]━─────━
     '''
     os.system('clear')
     elia5()
     print(tlg)
-    requests.post(f"https://api.telegram.org/bot{tok}/sendMessage", json={
-    "chat_id": iid,
-    "text": tlg,
-    "reply_markup": {
-        "inline_keyboard": [
-            [{"text": "ELIA", "url": "https://t.me/ELIA_Py"},
-             {"text": "Channel ", "url": "https://t.me/XRRHX"}]
-        ]
-    }
-})    
+    
+    # الإرسال لتيليجرام
+    try:
+        requests.post(f"https://api.telegram.org/bot{tok}/sendMessage", json={
+        "chat_id": iid,
+        "text": tlg,
+        "reply_markup": {
+            "inline_keyboard": [
+                [{"text": "ELIA", "url": "https://t.me/ELIA_Py"},
+                 {"text": "Channel ", "url": "https://t.me/XRRHX"}]
+            ]
+        }
+        })
+    except:
+        pass
+    
 
 def gmail_elia(email):
     global insta_good,insta_bad,email_bad,email_good
