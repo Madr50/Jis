@@ -6,15 +6,18 @@ import uuid
 import time
 from datetime import datetime
 from user_agent import generate_user_agent
-from urllib.parse import urlencode
 
-Mustafa = input("- Enter your token bot : ")
+# إضافة يوزرك وحقوقك هنا عند تشغيل الأداة
+print("—" * 40)
+print("Dev: @T8MT8 | سيد علوي")
+print("—" * 40)
 
-Mustafa_api = f"https://api.telegram.org/bot{Mustafa}"
+karbo = input("- Enter your token bot: ").strip()
+karbo_api = f"https://api.telegram.org/bot{karbo}"
 
 user_states = {}
 
-state_Mustafa = {
+state_karbo = {
     "ar": {
         "welcome":       "- هلا حب اختار شتريد :",
         "btn_reset":     "ارسال ريست",
@@ -49,7 +52,7 @@ state_Mustafa = {
 
 def t(chat_id, key):
     lang = user_states.get(chat_id, {}).get("lang", "ar")
-    return state_Mustafa[lang][key]
+    return state_karbo[lang][key]
 
 
 def _gDv(new_password):
@@ -68,74 +71,53 @@ def _gDv(new_password):
     pw = f"#PWD_INSTAGRAM:0:{ts}:{new_password}"
     return aid, ua, wf, pw
 
-zbe = "https://www.instagram.com"
-kse = "https://www.instagram.com/accounts/password/reset/"
-ahh = "https://www.instagram.com/api/v1/web/accounts/account_recovery_send_ajax/"
-Mustafa_ua = ("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 "
-          "(KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36")
-hhh = ("Instagram 320.0.0.34.109 Android (33/13; 420dpi; 1080x2340; "
-          "samsung; SM-A546B; a54x; exynos1380; tr_TR; 465123678)")
 
-def send_reset(username):
-    client = httpx.Client(http2=True, follow_redirects=True, timeout=30)
+def Eizonxtool(user):
     try:
-        client.get(zbe, headers={
-            "User-Agent": Mustafa_ua,
-            "Accept": "text/html,application/xhtml+xml,*/*;q=0.9",
-            "Accept-Language": "tr-TR,tr;q=0.9",
-        })
-        
-        csrf = ""
-        for c in client.cookies.jar:
-            if c.name == "csrftoken":
-                csrf = c.value
-                break
-        
-        if not csrf:
-            return {"success": False, "error": "Could not get CSRF token"}
-        
         headers = {
-            "User-Agent": hhh,
-            "Accept": "*/*",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Origin": zbe,
-            "Referer": kse,
-            "X-CSRFToken": csrf,
-            "X-IG-App-ID": "936619743392459",
-            "X-Requested-With": "XMLHttpRequest",
-            "X-Instagram-AJAX": "1",
+            "user-agent": generate_user_agent(),
+            "x-ig-app-id": "936619743392459",
+            "x-requested-with": "XMLHttpRequest",
+            "x-instagram-ajax": "1032099486",
+            "x-csrftoken": "missing",
+            "x-asbd-id": "359341",
+            "origin": "https://www.instagram.com",
+            "referer": "https://www.instagram.com/accounts/password/reset/",
+            "accept-language": "en-US",
+            "priority": "u=1, i",
         }
-        
-        data = urlencode({"email_or_username": username})
-        r = client.post(ahh, content=data.encode(), headers=headers)
-        result = r.json()
-        
-        if result.get("status") == "ok":
-            contact = result.get("contact_point") or result.get("obfuscated_email") or result.get("body", "Sent")
+        with httpx.Client(http2=True, headers=headers, timeout=20) as client:
+            r = client.post(
+                "https://www.instagram.com/api/v1/web/accounts/account_recovery_send_ajax/",
+                data={"email_or_username": user}
+            )
+        response = r.json()
+        if response.get('status') == 'ok':
+            contact = response.get('contact_point', 'Email/SMS sent')
             return {"success": True, "contact": contact}
-        elif result.get("status") == "fail":
-            msg = result.get("message", "Unknown error")
-            return {"success": False, "error": msg}
         else:
-            return {"success": False, "error": "Unexpected response"}
-        
+            return {"success": False, "error": response.get('message', 'Unknown Error')}
     except Exception as e:
         return {"success": False, "error": str(e)}
-    finally:
-        client.close()
+
 
 def make_headers(mid="", user_agent=""):
-    return {
+    headers = {
         "User-Agent": user_agent,
-        "X-Mid": mid,
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Bloks-Version-Id": "e061cacfa956f06869fc2b678270bef1583d2480bf51f508321e64cfb5cc12bd",
     }
+    if mid:
+        headers["X-Mid"] = mid
+    return headers
 
 
 def _rLk(reset_link, new_password):
     try:
         ANDROID_ID, USER_AGENT, WATERFALL_ID, PASSWORD = _gDv(new_password)
+
+        if "uidb36=" not in reset_link or "&token=" not in reset_link:
+            return {"success": False, "error": "Invalid reset link format"}
 
         uidb36 = reset_link.split("uidb36=")[1].split("&token=")[0]
         token = reset_link.split("&token=")[1].split(":")[0]
@@ -152,9 +134,9 @@ def _rLk(reset_link, new_password):
         r = requests.post(url, headers=make_headers(user_agent=USER_AGENT), data=data)
 
         if "user_id" not in r.text:
-            return {"success": False, "error": r.text}
+            return {"success": False, "error": f"Step 1 Failed: {r.text[:100]}"}
 
-        mid = r.headers.get("Ig-Set-X-Mid")
+        mid = r.headers.get("Ig-Set-X-Mid", "")
         resp = r.json()
 
         user_id = resp.get("user_id")
@@ -167,10 +149,7 @@ def _rLk(reset_link, new_password):
             "user_id": str(user_id),
             "cni": str(cni),
             "nonce_code": str(nonce_code),
-            "bk_client_context": (
-                '{"bloks_version":"e061cacfa956f06869fc2b678270bef1583d2480bf51f508321e64cfb5cc12bd",'
-                '"styles_id":"instagram"}'
-            ),
+            "bk_client_context": '{"bloks_version":"e061cacfa956f06869fc2b678270bef1583d2480bf51f508321e64cfb5cc12bd","styles_id":"instagram"}',
             "challenge_context": str(challenge_context),
             "bloks_versioning_id": "e061cacfa956f06869fc2b678270bef1583d2480bf51f508321e64cfb5cc12bd",
             "get_challenge": "true"
@@ -179,11 +158,14 @@ def _rLk(reset_link, new_password):
         r2 = requests.post(url2, headers=make_headers(mid, USER_AGENT), data=data2).text
 
         if str(cni) not in r2:
-            return {"success": False, "error": "Challenge failed"}
+            return {"success": False, "error": "Challenge structural payload mismatch"}
 
-        challenge_final = r2.replace("\\", "").split(f"(bk.action.i64.Const, {cni}), \"")[1].split(
-            "\", (bk.action.bool.Const, false)))"
-        )[0]
+        try:
+            challenge_final = r2.replace("\\", "").split(f"(bk.action.i64.Const, {cni}), \"")[1].split(
+                "\", (bk.action.bool.Const, false)))"
+            )[0]
+        except IndexError:
+            return {"success": False, "error": "Failed parsing challenge context tokens from Bloks response."}
 
         data3 = {
             "is_caa": "False",
@@ -195,33 +177,39 @@ def _rLk(reset_link, new_password):
         }
 
         requests.post(url2, headers=make_headers(mid, USER_AGENT), data=data3)
-
         return {"success": True, "password": new_password}
 
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+
 def send_message(chat_id, text, reply_markup=None):
     payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
     if reply_markup:
         payload["reply_markup"] = reply_markup
-    requests.post(f"{Mustafa_api}/sendMessage", json=payload)
+    try:
+        requests.post(f"{karbo_api}/sendMessage", json=payload, timeout=10)
+    except Exception as e:
+        print(f"Error sending message: {e}")
 
 
 def answer_callback(callback_id, text=""):
-    requests.post(f"{Mustafa_api}/answerCallbackQuery", json={"callback_query_id": callback_id, "text": text})
+    try:
+        requests.post(f"{karbo_api}/answerCallbackQuery", json={"callback_query_id": callback_id, "text": text}, timeout=10)
+    except Exception as e:
+        print(f"Error answering callback: {e}")
 
 
 def lang_menu(chat_id):
     markup = {
         "inline_keyboard": [
             [
-                {"text": state_Mustafa["ar"]["btn_ar"], "callback_data": "lang_ar"},
-                {"text": state_Mustafa["ar"]["btn_en"], "callback_data": "lang_en"}
+                {"text": state_karbo["ar"]["btn_ar"], "callback_data": "lang_ar"},
+                {"text": state_karbo["ar"]["btn_en"], "callback_data": "lang_en"}
             ]
         ]
     }
-    send_message(chat_id, state_Mustafa["ar"]["choose_lang"], markup)
+    send_message(chat_id, state_karbo["ar"]["choose_lang"], markup)
 
 
 def main_menu(chat_id):
@@ -239,15 +227,15 @@ def get_updates(offset=None):
     if offset:
         params["offset"] = offset
     try:
-        r = requests.get(f"{Mustafa_api}/getUpdates", params=params, timeout=35)
+        r = requests.get(f"{karbo_api}/getUpdates", params=params, timeout=35)
         return r.json().get("result", [])
-    except:
+    except Exception as e:
         return []
 
 
 def handle_message(message):
     chat_id = message["chat"]["id"]
-    text = message.get("text", "")
+    text = message.get("text", "").strip()
 
     if text == "/start":
         user_states[chat_id] = {"state": "choosing_lang", "lang": "ar"}
@@ -258,7 +246,7 @@ def handle_message(message):
     state = state_data.get("state", "idle")
 
     if state == "waiting_user_reset":
-        result = send_reset(text.strip())  
+        result = Eizonxtool(text)
         if result.get("success"):
             send_message(chat_id, t(chat_id, "success_reset").format(result["contact"]))
         else:
@@ -268,13 +256,12 @@ def handle_message(message):
 
     elif state == "waiting_reset_link":
         user_states[chat_id]["state"] = "waiting_new_pass"
-        user_states[chat_id]["data"] = {"link": text.strip()}
+        user_states[chat_id]["data"] = {"link": text}
         send_message(chat_id, t(chat_id, "ask_pass"))
 
     elif state == "waiting_new_pass":
         link = state_data.get("data", {}).get("link", "")
-        new_pass = text.strip()
-        result = _rLk(link, new_pass)
+        result = _rLk(link, text)
         if result.get("success"):
             send_message(chat_id, t(chat_id, "success_pass").format(f"<code>{result['password']}</code>"))
         else:
@@ -289,6 +276,9 @@ def handle_callback(callback):
     callback_id = callback["id"]
 
     answer_callback(callback_id)
+
+    if chat_id not in user_states:
+        user_states[chat_id] = {"state": "idle", "lang": "ar"}
 
     if data == "lang_ar":
         user_states[chat_id] = {"state": "idle", "lang": "ar"}
@@ -309,6 +299,7 @@ def handle_callback(callback):
 
 def run():
     offset = None
+    print("[+] Bot started parsing update loops successfully...")
     while True:
         updates = get_updates(offset)
         for update in updates:
